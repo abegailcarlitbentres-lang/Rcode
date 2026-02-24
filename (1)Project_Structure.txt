@@ -1,0 +1,13 @@
+survey_project/
+├── survey/
+│   ├── models.py
+│   ├── views.py
+│   ├── forms.py
+│   ├── urls.py
+│   └── templates/
+│       ├── create_survey.html
+│       ├── survey_detail.html
+│       ├── take_survey.html
+│       └── results.html
+├── settings.py
+└── requirements.txt

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Results: {{ survey.title }}</h2>
+    <p class="text-muted">Total Responses: <strong>{{ total_responses }}</strong></p>
+
+    {% for item in results %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5>{{ forloop.counter }}. {{ item.question.text }}</h5>
+
+                {% if item.question.question_type == 'text' %}
+                    {% for answer in item.answers %}
+                        <div class="p-2 mb-1 bg-light rounded">{{ answer }}</div>
+                    {% empty %}
+                        <p class="text-muted">No answers yet.</p>
+                    {% endfor %}
+
+                {% elif item.choice_data %}
+                    <canvas id="chart_{{ item.question.id }}" height="100"></canvas>
+                    <script>
+                        const data_{{ item.question.id }} = {{ item.chart_data|safe }};
+                        new Chart(document.getElementById('chart_{{ item.question.id }}'), {
+                            type: 'bar',
+                            data: {
+                                labels: data_{{ item.question.id }}.labels,
+                                datasets: [{
+                                    label: 'Responses',
+                                    data: data_{{ item.question.id }}.counts,
+                                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                                }]
+                            }
+                        });
+                    </script>
+
+                {% elif item.rating_data %}
+                    {% for r in item.rating_data %}
+                        <div class="d-flex align-items-center mb-1">
+                            <span class="me-2">⭐ {{ r.rating }}</span>
+                            <div class="progress flex-grow-1" style="height:20px;">
+                                <div class="progress-bar" style="width: {% if total_responses %}{{ r.count|floatformat:0 }}{% else %}0{% endif %}%">
+                                    {{ r.count }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
